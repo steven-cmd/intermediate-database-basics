@@ -1,0 +1,220 @@
+select * from invoice join invoice_line on invoice.invoice_id = invoice_line.invoice_id where invoice_line.unit_price > 0.99;
+
+select invoice_date, first_name, last_name, total
+from invoice 
+join customer 
+on invoice.customer_id = customer.customer_id;
+
+select c.first_name, c.last_name, e.first_name, e.last_name
+from customer c
+join employee e
+on c.support_rep_id = e.employee_id;
+
+select al.title, ar.name 
+from album al
+join artist ar
+on al.artist_id = ar.artist_id;
+
+select p.playlist_track_id
+from playlist_track p
+join playlist pl
+on p.playlist_id = pl.playlist_id
+where pl.name = 'Music';
+
+select t.name
+from playlist_track p
+join track t
+on p.track_id = t.track_id
+where p.playlist_id = 5;
+
+select t.name, p.name
+from track t
+join playlist_track pt
+on t.track_id = pt.track_id
+join playlist p
+on p.playlist_id = pt.playlist_id;
+
+select t.name, a.title
+from track t
+join album a
+on t.album_id = a.album_id
+join genre g
+on t.genre_id = g.genre_id
+where g.name = 'Alternative & Punk';
+
+BLACK DIAMOND
+select t.name, g.name, a.title, ar.name
+from track t
+join genre g
+on t.genre_id = g.genre_id
+join album a
+on t.album_id = a.album_id
+join artist ar
+on a.artist_id = ar.artist_id
+join playlist_track pt
+on t.track_id = pt.track_id
+join playlist p
+on pt.playlist_id = p.playlist_id
+where p.name = 'Music';
+
+select * 
+from invoice i
+where i.invoice_id 
+in
+(select il.invoice_id
+ from invoice_line il
+ where il.unit_price > 0.99);
+ 
+ select * 
+from playlist_track pt
+where pt.playlist_id
+in
+(select p.playlist_id
+ from playlist p
+ where p.name = 'Music');
+
+ select t.name
+from track t
+where t.track_id
+in
+(select pt.track_id
+ from playlist_track pt
+ where pt.playlist_id = 5);
+
+ select *
+from track t
+where t.genre_id
+in
+(select g.genre_id
+ from genre g
+ where g.name = 'Comedy');
+
+
+ select *
+from track t
+where t.album_id
+in
+(select a.album_id
+ from album a
+ where a.title = 'Fireball');
+
+ select * 
+from track t 
+where t.album_id
+in
+(select a.album_id
+ from album a
+ where a.artist_id
+ in
+ (select ar.artist_id
+  from artist ar
+  where ar.name = 'Queen'));
+
+update customer
+set fax = null
+where fax is not null;
+
+update customer
+set company = 'Self'
+where company is null;
+
+update customer 
+set last_name = 'Thompson' 
+where first_name = 'Julia' and last_name = 'Barnett';
+
+update customer
+set support_rep_id = 4
+where email = 'luisrojas@yahoo.cl';
+
+update track 
+set composer = 'The darkness around us'
+where genre_id 
+in
+(select g.genre_id 
+ from genre g
+ where g.name = 'Metal')
+and composer is null;
+
+
+select g.name, count(*)
+from genre g
+join track t
+on t.genre_id = g.genre_id
+group by g.name;
+
+select g.name, count(*)
+from genre g
+join track t
+on t.genre_id = g.genre_id
+where g.name = 'Pop' or g.name = 'Rock'
+group by g.name;
+
+
+select ar.name, count(*)
+from artist ar
+join album al
+on ar.artist_id = al.artist_id
+group by ar.name;
+
+select distinct composer
+from track;
+
+select distinct billing_postal_code
+from invoice;
+
+select distinct company
+from customer;
+
+delete from practice_delete
+where type = 'bronze';
+
+delete from practice_delete
+where type = 'silver';
+
+delete from practice_delete
+where value = 150;
+
+create table users (id serial primary key, name text, email text);
+create table product (id serial primary key, name text, price integer);
+create table orders (id serial primary key, user_id integer references users(id), prod_id integer references product(id));
+
+
+insert into users (name, email) values ('dog', 'dog@dog.com');
+insert into users (name, email) values ('cat', 'cat@cat.com');
+insert into users (name, email) values ('bird', 'bird@bird.com');
+
+insert into product (name, price) values ('chew toy', 5);
+insert into product (name, price) values ('yarn', 2);
+insert into product (name, price) values ('bell', 3);
+
+insert into orders(user_id, prod_id) values (1, 1);
+insert into orders(user_id, prod_id) values (2, 2);
+insert into orders(user_id, prod_id) values (2, 3);
+insert into orders(user_id, prod_id) values (3, 3);
+
+
+select * from product p join orders o on o.prod_id = p.id where o.id = 1;
+select * from orders;
+select price from orders;
+select price from product p join orders o on p.id = o.prod_id;
+
+select *
+from orders o 
+join users u
+on o.user_id = u.id
+where u.name = 'cat';
+
+select u.name, count(*)
+from users u 
+join orders o
+on u.id = o.user_id
+group by u.name;
+
+BLACK DIAMOND 
+select u.name, sum(p.price) as total
+from users u
+join orders o
+on u.id = o.user_id
+join product p
+on p.id = o.prod_id
+group by u.name;
